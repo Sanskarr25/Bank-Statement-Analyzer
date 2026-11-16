@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khata – Bank statement analyzer</title>
+<link rel="stylesheet" href="/static/style.css?v=2">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/">Khata</a>
+  <span class="tag">See where your money went</span>
+</header>
+
+<main>
+  <!-- 1. UPLOAD -->
+  <section id="view-upload" class="narrow">
+    <h1>Upload your bank statement</h1>
+    <p class="lead">Drop in the PDF and get a clear picture of what came in, what went out, and where it went. Your file is read on this computer and deleted right after.</p>
+
+    <form id="upload-form">
+      <div class="drop" id="drop">
+        <input type="file" id="file" class="overlay" accept="application/pdf,.pdf" aria-label="Choose a PDF statement">
+        <strong id="drop-title">Choose a PDF or drag it here</strong>
+        <span id="drop-sub">SBI “Statement of Account”, up to 60 MB</span>
+      </div>
+
+      <div class="row">
+        <label class="field">Bank
+          <select id="bank"></select>
+        </label>
+        <label class="field">PDF password <em>(only if it has one)</em>
+          <input type="password" id="password" autocomplete="off">
+        </label>
+      </div>
+
+      <button class="btn" id="go" type="submit" disabled>Analyze statement</button>
+      <p class="error" id="upload-error" role="alert" hidden></p>
+    </form>
+
+    <p class="note">Scanned or printed PDFs work too. They are read with OCR, which takes a few minutes for a long statement.</p>
+  </section>
+
+  <!-- 2. PROGRESS -->
+  <section id="view-progress" class="narrow" hidden>
+    <h1>Reading your statement</h1>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div id="bar-fill"></div></div>
+    <p id="progress-msg" class="lead">Starting…</p>
+  </section>
+
+  <!-- 3. DASHBOARD -->
+  <section id="view-dash" hidden>
+    <div class="dash-head">
+      <div>
+        <p class="meta" id="meta"></p>
+        <h1 id="hero" class="hero"></h1>
+      </div>
+      <div class="controls">
+        <label class="field inline">Show
+          <select id="month"></select>
+        </label>
+        <button class="btn ghost" id="new">Upload another</button>
+      </div>
+    </div>
+
+    <p id="check" class="check" hidden></p>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="grid">
+      <article class="card wide">
+        <h2>Month by month</h2>
+        <p class="hint">Green is money in, red is money out. Click a month to look at it closely.</p>
+        <div class="chart tall"><canvas id="c-monthly"></canvas></div>
+      </article>
+
+      <article class="card">
+        <h2>Where your money went</h2>
+        <div class="chart donut"><canvas id="c-cat"></canvas></div>
+        <ul class="cats" id="cat-list"></ul>
+      </article>
+
+      <article class="card">
+        <h2>Things worth knowing</h2>
+        <ul class="insights" id="insights"></ul>
+        <h2 class="sub">Where money came from</h2>
+        <ul class="plain" id="sources"></ul>
+      </article>
+
+      <article class="card wide">
+        <h2>Balance over time</h2>
+        <div class="chart"><canvas id="c-balance"></canvas></div>
+      </article>
+
+      <article class="card">
+        <h2>Which days you spend most</h2>
+        <div class="chart"><canvas id="c-weekday"></canvas></div>
+      </article>
+
+      <article class="card">
+        <h2>Who you paid most</h2>
+        <table class="mini" id="payees"></table>
+      </article>
+
+      <article class="card wide">
+        <h2>Your 10 biggest payments</h2>
+        <table class="mini" id="top-exp"></table>
+      </article>
+    </div>
+
+    <article class="card" id="txn-card">
+      <div class="txn-head">
+        <h2>All transactions <span id="txn-count" class="muted"></span></h2>
+        <a class="btn ghost small" id="csv" href="#">Download CSV</a>
+      </div>
+      <div class="filters">
+        <input type="search" id="q" placeholder="Search name or details">
+        <select id="f-flow">
+          <option value="">Money in and out</option>
+          <option value="out">Money out only</option>
+          <option value="in">Money in only</option>
+        </select>
+        <select id="f-cat"><option value="">All categories</option></select>
+      </div>
+      <div class="scroll">
+        <table class="txns">
+          <thead><tr><th>Date</th><th>Details</th><th>Category</th><th class="num">Out</th><th class="num">In</th><th class="num">Balance</th></tr></thead>
+          <tbody id="txn-body"></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button class="btn ghost small" id="prev">Previous</button>
+        <span id="page-info"></span>
+        <button class="btn ghost small" id="next">Next</button>
+      </div>
+    </article>
+  </section>
+</main>
+
+<script src="/static/vendor/chart.umd.js"></script>
+<script src="/static/app.js?v=2"></script>
+</body>
+</html>
